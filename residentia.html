@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Residentia — Boarding House Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbar for clean UI */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .fade-in {
+      animation: fadeIn 0.2s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- =====================================================================
+       LOGIN / ROLE SELECTION SCREEN (FULLSCREEN EDGE-TO-EDGE SPLIT LAYOUT)
+       ===================================================================== -->
+  <div id="login-screen" class="min-h-screen w-full grid grid-cols-1 lg:grid-cols-12 bg-white">
+      
+    <!-- Left Branding Panel (Full-Height Deep Navy & Royal Blue Gradient) -->
+    <div class="lg:col-span-5 xl:col-span-5 bg-gradient-to-br from-slate-950 via-blue-950 to-blue-900 text-white p-8 sm:p-12 lg:p-14 flex flex-col justify-between relative overflow-hidden">
+      <div class="absolute -right-16 -bottom-16 w-80 h-80 rounded-full bg-blue-500/15 blur-2xl pointer-events-none"></div>
+      <div class="absolute -left-12 top-16 w-56 h-56 rounded-full bg-sky-400/10 blur-xl pointer-events-none"></div>
+      <div class="absolute right-10 top-10 w-24 h-24 rounded-2xl border border-blue-400/15 rotate-12 pointer-events-none"></div>
+      
+      <div class="relative z-10">
+        <div class="inline-flex items-center gap-2.5 bg-blue-500/20 border border-blue-400/25 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase text-sky-200 mb-8">
+          <i class="fa-solid fa-building-user text-sky-300"></i>
+          <span>Residentia System</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl xl:text-5xl font-extrabold tracking-tight leading-tight mb-4 text-white">
+          Residentia Boarding House
+        </h1>
+        <p class="text-blue-200/90 text-sm sm:text-base leading-relaxed max-w-md">
+          Barangay 1-EM's Barrio, Legazpi City, Albay
+        </p>
+
+        <!-- Property Highlights Cards -->
+        <div class="grid grid-cols-2 gap-3 mt-10 max-w-md">
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xs">
+            <div class="text-sky-300 text-xs font-semibold uppercase tracking-wider mb-1">Total Capacity</div>
+            <div class="text-2xl font-extrabold text-white">10 Rooms</div>
+            <div class="text-xs text-blue-200/75 mt-0.5">Solo & Bedspace Units</div>
+          </div>
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xs">
+            <div class="text-sky-300 text-xs font-semibold uppercase tracking-wider mb-1">Active Boarders</div>
+            <div class="text-2xl font-extrabold text-white">14 Tenants</div>
+            <div class="text-xs text-blue-200/75 mt-0.5">Male & Female Property</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative z-10 mt-12 space-y-3 text-xs text-blue-200/90 border-t border-blue-800/70 pt-6">
+        <div class="flex items-center justify-between">
+          <span>Property Owner:</span>
+          <span class="font-semibold text-white">Roberto Mendoza Cruz</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span>Property Classification:</span>
+          <span class="font-semibold text-white">Male & Female</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span>Database Sync:</span>
+          <span class="inline-flex items-center gap-1.5 font-semibold text-sky-300">
+            <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span> Live Local State
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Login & Demo Switcher Panel (Full-Height Crisp Ice/White Workspace) -->
+    <div class="lg:col-span-7 xl:col-span-7 bg-slate-50/70 p-8 sm:p-12 lg:p-16 flex flex-col justify-center items-center">
+      <div class="w-full max-w-xl bg-white p-8 sm:p-10 rounded-3xl border border-slate-200/90 shadow-xl shadow-blue-950/5">
+        <div class="mb-7">
+          <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Welcome Back</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Sign in to Portal</h2>
+          <p class="text-sm text-slate-500 mt-1">Enter your account credentials to access the portal.</p>
+        </div>
+
+        <form id="login-form" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Username</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                <i class="fa-solid fa-user"></i>
+              </span>
+              <input type="text" id="login-username" required placeholder="e.g. owner, juan, maria"
+                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Password</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                <i class="fa-solid fa-lock"></i>
+              </span>
+              <input type="password" id="login-password" required placeholder="Same as username in test DB"
+                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition" />
+            </div>
+          </div>
+          <p id="login-error" class="hidden text-xs text-rose-600 font-medium bg-rose-50 px-3.5 py-2.5 rounded-xl border border-rose-200"></p>
+          <button type="submit"
+            class="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md shadow-blue-600/20 transition flex items-center justify-center gap-2">
+            <span>Access Dashboard</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+        </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MAIN APPLICATION SHELL (FULLSCREEN WIDE DESKTOP & LAPTOP LAYOUT)
+       ===================================================================== -->
+  <div id="app-shell" class="hidden min-h-screen w-full flex flex-col">
+    
+    <!-- Top Navigation Bar (Full Width) -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 w-full">
+      <div class="w-full px-5 sm:px-8 lg:px-10 h-16 flex items-center justify-between gap-4">
+        
+        <!-- Brand & Location -->
+        <div class="flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 text-white flex items-center justify-center shadow-sm">
+            <i class="fa-solid fa-house-chimney text-base"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2.5">
+              <span class="font-extrabold text-slate-900 tracking-tight text-lg">Residentia</span>
+              <span id="role-badge" class="px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded-full bg-blue-100 text-blue-800">
+                Owner
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500 hidden sm:block">Brgy. 1 EM's Barrio, Legazpi City, Albay</p>
+          </div>
+        </div>
+
+        <!-- Instant Role Switcher & User Profile -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <label for="quick-role-select" class="text-[11px] font-semibold text-slate-500 px-2.5 hidden md:inline">
+              Switch Account:
+            </label>
+            <select id="quick-role-select" onchange="switchAccount(this.value)"
+              class="bg-white text-xs font-semibold text-slate-800 py-1.5 px-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 cursor-pointer">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+
+          <button onclick="logout()" title="Sign Out"
+            class="p-2.5 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sub-Navigation Tabs (Full Width) -->
+      <div class="bg-blue-50/40 border-t border-slate-200/80 overflow-x-auto w-full">
+        <div id="nav-tabs" class="w-full px-5 sm:px-8 lg:px-10 flex items-center gap-1.5 py-2">
+          <!-- Populated dynamically based on role -->
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Viewport (Full Width Edge-to-Edge Container) -->
+    <main id="main-content" class="flex-1 w-full px-5 sm:px-8 lg:px-10 py-6 sm:py-8">
+      <!-- Dynamic view renders here -->
+    </main>
+
+    <!-- Footer (Full Width) -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto w-full">
+      <div class="w-full px-5 sm:px-8 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+        <div>
+          <span class="font-semibold text-slate-700">Residentia Boarding House</span> • Owner: Roberto Mendoza Cruz (09171234567)
+        </div>
+        <div class="flex items-center gap-4">
+          <span>DB Schema: <code class="bg-blue-50 text-blue-800 px-2 py-0.5 rounded font-semibold">residentia</code></span>
+          <button onclick="resetDatabase()" class="text-blue-600 hover:underline font-semibold">Reset Sample Data</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- =====================================================================
+       REUSABLE MODAL BACKDROP
+       ===================================================================== -->
+  <div id="modal-backdrop" class="hidden fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+    <div id="modal-box" class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden fade-in my-8">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <h3 id="modal-title" class="text-base font-bold text-slate-900">Modal Title</h3>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="modal-body" class="p-6 max-h-[80vh] overflow-y-auto">
+        <!-- Dynamic form content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       APPLICATION LOGIC & SEEDED SQL DATA
+       ===================================================================== -->
+  <script>
+    // -------------------------------------------------------------------------
+    // 1. INITIAL SEED DATA (Exact match to residentia-3.sql)
+    // -------------------------------------------------------------------------
+    const STORAGE_KEY = 'residentia_db_v1';
+
+    const INITIAL_DB = {
+      owner: {
+        owner_id: 1001,
+        first_name: 'Roberto',
+        middle_name: 'Mendoza',
+        last_name: 'Cruz',
+        contacts: ['09171234567', '09987654321']
+      },
+      boarding_house: {
+        bh_id: 1101,
+        owner_id: 1001,
+        bh_name: 'Residentia',
+        bh_type: 'Male & Female',
+        total_rooms: 10,
+        status: 'Active',
+        address: {
+          barangay: 'Barangay 1 - EM,s Barrio',
+          municipality: 'Legazpi City',
+          province: 'Albay'
+        }
+      },
+      accounts: [
+        { account_id: 1401, tenant_id: null, owner_id: 1001, username: 'owner', password: 'owner', user_role: 'Owner' },
+        { account_id: 1402, tenant_id: 1301, owner_id: null, username: 'juan', password: 'juan', user_role: 'Tenant' },
+        { account_id: 1403, tenant_id: 1302, owner_id: null, username: 'maria', password: 'maria', user_role: 'Tenant' },
+        { account_id: 1404, tenant_id: 1303, owner_id: null, username: 'mark', password: 'mark', user_role: 'Tenant' },
+        { account_id: 1405, tenant_id: 1304, owner_id: null, username: 'carlo', password: 'carlo', user_role: 'Tenant' },
+        { account_id: 1406, tenant_id: 1305, owner_id: null, username: 'angela', password: 'angela', user_role: 'Tenant' },
+        { account_id: 1407, tenant_id: 1306, owner_id: null, username: 'bea', password: 'bea', user_role: 'Tenant' },
+        { account_id: 1408, tenant_id: 1307, owner_id: null, username: 'camille', password: 'camille', user_role: 'Tenant' },
+        { account_id: 1409, tenant_id: 1308, owner_id: null, username: 'denise', password: 'denise', user_role: 'Tenant' },
+        { account_id: 1410, tenant_id: 1309, owner_id: null, username: 'erika', password: 'erika', user_role: 'Tenant' },
+        { account_id: 1411, tenant_id: 1310, owner_id: null, username: 'francis', password: 'francis', user_role: 'Tenant' },
+        { account_id: 1412, tenant_id: 1311, owner_id: null, username: 'gabriel', password: 'gabriel', user_role: 'Tenant' },
+        { account_id: 1413, tenant_id: 1312, owner_id: null, username: 'hector', password: 'hector', user_role: 'Tenant' },
+        { account_id: 1414, tenant_id: 1313, owner_id: null, username: 'ivan', password: 'ivan', user_role: 'Tenant' },
+        { account_id: 1415, tenant_id: 1314, owner_id: null, username: 'jerome', password: 'jerome', user_role: 'Tenant' }
+      ],
+      rooms: [
+        { room_id: 1201, bh_id: 1101, room_number: 'RM-101', room_type: 'Solo Room', capacity: 1, monthly_rate: 5000.00, room_status: 'Occupied' },
+        { room_id: 1202, bh_id: 1101, room_number: 'RM-102', room_type: 'Solo Room', capacity: 1, monthly_rate: 5000.00, room_status: 'Occupied' },
+        { room_id: 1203, bh_id: 1101, room_number: 'RM-103', room_type: 'Solo Room', capacity: 1, monthly_rate: 5000.00, room_status: 'Available' },
+        { room_id: 1204, bh_id: 1101, room_number: 'RM-201', room_type: 'Bedspace', capacity: 2, monthly_rate: 3000.00, room_status: 'Occupied' },
+        { room_id: 1205, bh_id: 1101, room_number: 'RM-202', room_type: 'Bedspace', capacity: 2, monthly_rate: 3000.00, room_status: 'Available' },
+        { room_id: 1206, bh_id: 1101, room_number: 'RM-301', room_type: 'Bedspace', capacity: 4, monthly_rate: 2500.00, room_status: 'Occupied' },
+        { room_id: 1207, bh_id: 1101, room_number: 'RM-302', room_type: 'Bedspace', capacity: 4, monthly_rate: 2500.00, room_status: 'Available' },
+        { room_id: 1208, bh_id: 1101, room_number: 'RM-303', room_type: 'Bedspace', capacity: 4, monthly_rate: 2500.00, room_status: 'Maintenance' },
+        { room_id: 1209, bh_id: 1101, room_number: 'RM-401', room_type: 'Bedspace', capacity: 6, monthly_rate: 2000.00, room_status: 'Available' },
+        { room_id: 1210, bh_id: 1101, room_number: 'RM-402', room_type: 'Bedspace', capacity: 6, monthly_rate: 2000.00, room_status: 'Available' }
+      ],
+      tenants: [
+        { tenant_id: 1301, first_name: 'Juan', middle_name: 'Santos', last_name: 'Dela Cruz', email: 'juan.delacruz@gmail.com', gender: 'Male', birthdate: '2003-05-14', occupation: 'Student', status: 'Active', contact: '09181110001', address: 'Barangay 1, Tabaco City, Albay', emergency: { name: 'Elena Dela Cruz', rel: 'Mother', phone: '09178880001' } },
+        { tenant_id: 1302, first_name: 'Maria', middle_name: 'Reyes', last_name: 'Clara', email: 'maria.clara@gmail.com', gender: 'Female', birthdate: '2002-08-22', occupation: 'Student', status: 'Active', contact: '09181110002', address: 'Barangay Centro, Daraga, Albay', emergency: { name: 'Ricardo Clara', rel: 'Father', phone: '09178880002' } },
+        { tenant_id: 1303, first_name: 'Mark', middle_name: 'Villanueva', last_name: 'Bautista', email: 'mark.bautista@gmail.com', gender: 'Male', birthdate: '1999-11-03', occupation: 'BPO Employee', status: 'Active', contact: '09181110003', address: 'Barangay San Roque, Naga City, Camarines Sur', emergency: { name: 'Sofia Bautista', rel: 'Sister', phone: '09178880003' } },
+        { tenant_id: 1304, first_name: 'Carlo', middle_name: 'Torres', last_name: 'Ramos', email: 'carlo.ramos@gmail.com', gender: 'Male', birthdate: '2001-07-30', occupation: 'Engineer', status: 'Active', contact: '09181110004', address: 'Barangay Washington, Sorsogon City, Sorsogon', emergency: { name: 'Ramon Ramos', rel: 'Father', phone: '09178880004' } },
+        { tenant_id: 1305, first_name: 'Angela', middle_name: 'Gomez', last_name: 'Aquino', email: 'angela.aquino@gmail.com', gender: 'Female', birthdate: '2004-01-19', occupation: 'Student', status: 'Active', contact: '09181110005', address: 'Barangay Poblacion, Ligao City, Albay', emergency: { name: 'Teresa Aquino', rel: 'Mother', phone: '09178880005' } },
+        { tenant_id: 1306, first_name: 'Bea', middle_name: 'Navarro', last_name: 'Alonzo', email: 'bea.alonzo@gmail.com', gender: 'Female', birthdate: '2003-12-10', occupation: 'Student', status: 'Active', contact: '09181110006', address: 'Barangay Malabog, Daraga, Albay', emergency: { name: 'Liza Alonzo', rel: 'Aunt', phone: '09178880006' } },
+        { tenant_id: 1307, first_name: 'Camille', middle_name: 'Castro', last_name: 'Diaz', email: 'camille.diaz@gmail.com', gender: 'Female', birthdate: '2003-03-25', occupation: 'Student', status: 'Active', contact: '09181110007', address: 'Barangay Cabangan, Camalig, Albay', emergency: { name: 'Mario Diaz', rel: 'Father', phone: '09178880007' } },
+        { tenant_id: 1308, first_name: 'Denise', middle_name: 'Flores', last_name: 'Garcia', email: 'denise.garcia@gmail.com', gender: 'Female', birthdate: '2002-09-14', occupation: 'Nurse', status: 'Active', contact: '09181110008', address: 'Barangay San Jose, Polangui, Albay', emergency: { name: 'Rosa Garcia', rel: 'Mother', phone: '09178880008' } },
+        { tenant_id: 1309, first_name: 'Erika', middle_name: 'Morales', last_name: 'Hernandez', email: 'erika.hernandez@gmail.com', gender: 'Female', birthdate: '2004-04-08', occupation: 'Student', status: 'Active', contact: '09181110009', address: 'Barangay Ilawod, Guinobatan, Albay', emergency: { name: 'Pedro Hernandez', rel: 'Father', phone: '09178880009' } },
+        { tenant_id: 1310, first_name: 'Francis', middle_name: 'Ocampo', last_name: 'Ignacio', email: 'francis.ignacio@gmail.com', gender: 'Male', birthdate: '2001-06-17', occupation: 'Accountant', status: 'Active', contact: '09181110010', address: 'Barangay Tayhi, Tabaco City, Albay', emergency: { name: 'Clara Ignacio', rel: 'Mother', phone: '09178880010' } },
+        { tenant_id: 1311, first_name: 'Gabriel', middle_name: 'Pascual', last_name: 'Jimenez', email: 'gabriel.jimenez@gmail.com', gender: 'Male', birthdate: '2002-10-29', occupation: 'Student', status: 'Active', contact: '09181110011', address: 'Barangay Bacacay, Bacacay, Albay', emergency: { name: 'Nestor Jimenez', rel: 'Father', phone: '09178880011' } },
+        { tenant_id: 1312, first_name: 'Hector', middle_name: 'Quinto', last_name: 'Lim', email: 'hector.lim@gmail.com', gender: 'Male', birthdate: '2003-02-11', occupation: 'Student', status: 'Active', contact: '09181110012', address: 'Barangay Salvacion, Pilar, Sorsogon', emergency: { name: 'Grace Lim', rel: 'Mother', phone: '09178880012' } },
+        { tenant_id: 1313, first_name: 'Ivan', middle_name: 'Rivera', last_name: 'Mendoza', email: 'ivan.mendoza@gmail.com', gender: 'Male', birthdate: '2000-12-05', occupation: 'IT Support', status: 'Active', contact: '09181110013', address: 'Barangay Sto. Domingo, Sto. Domingo, Albay', emergency: { name: 'Arthur Mendoza', rel: 'Brother', phone: '09178880013' } },
+        { tenant_id: 1314, first_name: 'Jerome', middle_name: 'Salazar', last_name: 'Osorio', email: 'jerome.osorio@gmail.com', gender: 'Male', birthdate: '2004-07-21', occupation: 'Student', status: 'Active', contact: '09181110014', address: 'Barangay Libon, Libon, Albay', emergency: { name: 'Nora Osorio', rel: 'Mother', phone: '09178880014' } }
+      ],
+      room_assignments: [
+        { assignment_id: 1501, tenant_id: 1301, room_id: 1201, movein_date: '2026-08-01', moveout_date: null },
+        { assignment_id: 1502, tenant_id: 1302, room_id: 1202, movein_date: '2026-08-05', moveout_date: null },
+        { assignment_id: 1503, tenant_id: 1303, room_id: 1204, movein_date: '2026-09-01', moveout_date: null },
+        { assignment_id: 1504, tenant_id: 1304, room_id: 1204, movein_date: '2026-09-01', moveout_date: null },
+        { assignment_id: 1505, tenant_id: 1305, room_id: 1205, movein_date: '2026-09-10', moveout_date: null },
+        { assignment_id: 1506, tenant_id: 1306, room_id: 1206, movein_date: '2026-08-15', moveout_date: null },
+        { assignment_id: 1507, tenant_id: 1307, room_id: 1206, movein_date: '2026-08-15', moveout_date: null },
+        { assignment_id: 1508, tenant_id: 1308, room_id: 1206, movein_date: '2026-08-20', moveout_date: null },
+        { assignment_id: 1509, tenant_id: 1309, room_id: 1206, movein_date: '2026-09-01', moveout_date: null },
+        { assignment_id: 1510, tenant_id: 1310, room_id: 1207, movein_date: '2026-09-15', moveout_date: null },
+        { assignment_id: 1511, tenant_id: 1311, room_id: 1207, movein_date: '2026-10-01', moveout_date: null },
+        { assignment_id: 1512, tenant_id: 1312, room_id: 1209, movein_date: '2026-10-05', moveout_date: null },
+        { assignment_id: 1513, tenant_id: 1313, room_id: 1209, movein_date: '2026-10-10', moveout_date: null },
+        { assignment_id: 1514, tenant_id: 1314, room_id: 1209, movein_date: '2026-10-12', moveout_date: null }
+      ],
+      billings: [
+        {
+          billing_id: 1801, owner_id: 1001, tenant_id: 1301,
+          billing_start_date: '2026-11-01', billing_end_date: '2026-11-30', due_date: '2026-11-05',
+          payment_status: 'Paid',
+          details: [
+            { billing_details_id: 1811, charge_type: 'Rent', amount: 5000.00 },
+            { billing_details_id: 1812, charge_type: 'Water', amount: 150.00 },
+            { billing_details_id: 1813, charge_type: 'Electricity', amount: 450.00 },
+            { billing_details_id: 1814, charge_type: 'Internet', amount: 200.00 }
+          ]
+        },
+        {
+          billing_id: 1802, owner_id: 1001, tenant_id: 1302,
+          billing_start_date: '2026-11-01', billing_end_date: '2026-11-30', due_date: '2026-11-05',
+          payment_status: 'Partial',
+          details: [
+            { billing_details_id: 1815, charge_type: 'Rent', amount: 5000.00 },
+            { billing_details_id: 1816, charge_type: 'Water', amount: 150.00 },
+            { billing_details_id: 1817, charge_type: 'Electricity', amount: 400.00 }
+          ]
+        },
+        {
+          billing_id: 1803, owner_id: 1001, tenant_id: 1303,
+          billing_start_date: '2026-11-01', billing_end_date: '2026-11-30', due_date: '2026-11-10',
+          payment_status: 'Unpaid',
+          details: [
+            { billing_details_id: 1818, charge_type: 'Rent', amount: 3000.00 },
+            { billing_details_id: 1819, charge_type: 'Internet', amount: 200.00 }
+          ]
+        },
+        {
+          billing_id: 1804, owner_id: 1001, tenant_id: 1306,
+          billing_start_date: '2026-11-01', billing_end_date: '2026-11-30', due_date: '2026-11-05',
+          payment_status: 'Overdue',
+          details: [
+            { billing_details_id: 1820, charge_type: 'Rent', amount: 2500.00 }
+          ]
+        },
+        {
+          billing_id: 1805, owner_id: 1001, tenant_id: 1312,
+          billing_start_date: '2026-11-01', billing_end_date: '2026-11-30', due_date: '2026-11-10',
+          payment_status: 'Paid',
+          details: [
+            { billing_details_id: 1821, charge_type: 'Rent', amount: 2000.00 },
+            { billing_details_id: 1822, charge_type: 'Water', amount: 100.00 },
+            { billing_details_id: 1823, charge_type: 'Electricity', amount: 250.00 }
+          ]
+        }
+      ],
+      payments: [
+        { payment_id: 1901, owner_id: 1001, billing_id: 1801, payment_method: 'GCash', receipt_number: 'OR-20261101', payment_date: '2026-11-04', amount_paid: 5800.00 },
+        { payment_id: 1902, owner_id: 1001, billing_id: 1802, payment_method: 'Cash', receipt_number: 'OR-20261102', payment_date: '2026-11-05', amount_paid: 3000.00 },
+        { payment_id: 1903, owner_id: 1001, billing_id: 1805, payment_method: 'Bank Transfer', receipt_number: 'OR-20261103', payment_date: '2026-11-09', amount_paid: 2350.00 }
+      ],
+      expenses: [
+        { expense_id: 1951, bh_id: 1101, owner_id: 1001, expense_category: 'Electricity', description: 'ALECO Monthly Building Electric Bill - October', amount: 8450.50, expense_date: '2026-11-02' },
+        { expense_id: 1952, bh_id: 1101, owner_id: 1001, expense_category: 'Water', description: 'LCWD Monthly Water Bill - October', amount: 2150.00, expense_date: '2026-11-03' },
+        { expense_id: 1953, bh_id: 1101, owner_id: 1001, expense_category: 'Internet', description: 'PLDT Fiber Business Plan 300Mbps', amount: 2699.00, expense_date: '2026-11-05' },
+        { expense_id: 1954, bh_id: 1101, owner_id: 1001, expense_category: 'Repair & Maintenance', description: 'Replaced faucet cartridge in RM-101 and repainting RM-303', amount: 1200.00, expense_date: '2026-11-07' }
+      ],
+      maintenance_requests: [
+        { request_id: 1701, tenant_id: 1301, room_id: 1201, owner_id: 1001, request_title: 'Leaking Bathroom Faucet', request_description: 'The sink faucet in RM-101 drips continuously even when tightly closed.', request_date: '2026-11-05', status: 'Completed', completion_date: '2026-11-07' },
+        { request_id: 1702, tenant_id: 1303, room_id: 1204, owner_id: 1001, request_title: 'Flickering Ceiling Light', request_description: 'Main fluorescent tube in RM-201 flickers at night.', request_date: '2026-11-11', status: 'Pending', completion_date: null }
+      ],
+      announcements: [
+        { announcement_id: 1601, owner_id: 1001, announcement_title: 'Scheduled Water Interruption', announcement_message: 'Please store water ahead of time. Water District maintenance on Nov 15, 8AM-5PM.', date_published: '2026-11-10', recipients: [1301, 1302, 1303] },
+        { announcement_id: 1602, owner_id: 1001, announcement_title: 'Curfew & Visitor Policy Reminder', announcement_message: 'Reminder that visitors are only allowed in the common area until 8:00 PM.', date_published: '2026-11-12', recipients: [1306, 1310, 1312] }
+      ]
+    };
+
+    // -------------------------------------------------------------------------
+    // 2. STATE MANAGEMENT & PERSISTENCE
+    // -------------------------------------------------------------------------
+    let db = loadDB();
+    let currentUser = null; // Account object
+    let activeTab = 'overview';
+    let tenantSearchQuery = '';
+    let roomFilterStatus = 'All';
+
+    function loadDB() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error('Corrupt DB in localStorage, resetting.');
+        }
+      }
+      return structuredClone(INITIAL_DB);
+    }
+
+    function saveDB() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    }
+
+    function resetDatabase() {
+      db = structuredClone(INITIAL_DB);
+      saveDB();
+      showToast('Database reset to initial residentia-3.sql state.', 'info');
+      if (currentUser) {
+        renderApp();
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. HELPER & FORMATTING FUNCTIONS
+    // -------------------------------------------------------------------------
+    function formatCurrency(val) {
+      return '₱' + Number(val || 0).toLocaleString('en-PH', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function getTenantById(id) {
+      return db.tenants.find(t => t.tenant_id === Number(id));
+    }
+
+    function getTenantFullName(t) {
+      if (!t) return 'Unknown Tenant';
+      return `${t.first_name} ${t.last_name}`;
+    }
+
+    function getRoomById(id) {
+      return db.rooms.find(r => r.room_id === Number(id));
+    }
+
+    function getActiveAssignmentForTenant(tenantId) {
+      return db.room_assignments.find(a => a.tenant_id === Number(tenantId) && !a.moveout_date);
+    }
+
+    function getOccupancyCountForRoom(roomId) {
+      return db.room_assignments.filter(a => a.room_id === Number(roomId) && !a.moveout_date).length;
+    }
+
+    function getBillingTotal(billing) {
+      return billing.details.reduce((sum, item) => sum + Number(item.amount), 0);
+    }
+
+    function getPaidAmountForBilling(billingId) {
+      return db.payments
+        .filter(p => p.billing_id === Number(billingId))
+        .reduce((sum, p) => sum + Number(p.amount_paid), 0);
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const colors = {
+        success: 'bg-blue-950 text-white border-blue-700',
+        error: 'bg-rose-900 text-white border-rose-700',
+        info: 'bg-slate-900 text-white border-slate-700'
+      };
+      const icons = {
+        success: 'fa-circle-check text-sky-400',
+        error: 'fa-circle-exclamation text-rose-400',
+        info: 'fa-circle-info text-blue-400'
+      };
+      const el = document.createElement('div');
+      el.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border text-xs font-medium fade-in ${colors[type] || colors.info}`;
+      el.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-sm"></i><span>${message}</span>`;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 0.25s ease';
+        setTimeout(() => el.remove(), 250);
+      }, 3200);
+    }
+
+    function badgeHTML(status) {
+      const map = {
+        'Available': 'bg-emerald-100 text-emerald-800 border-emerald-200',
+        'Occupied': 'bg-sky-100 text-sky-800 border-sky-200',
+        'Maintenance': 'bg-amber-100 text-amber-800 border-amber-200',
+        'Active': 'bg-emerald-100 text-emerald-800 border-emerald-200',
+        'Inactive': 'bg-slate-100 text-slate-700 border-slate-200',
+        'Blacklisted': 'bg-rose-100 text-rose-800 border-rose-200',
+        'Paid': 'bg-emerald-100 text-emerald-800 border-emerald-200',
+        'Partial': 'bg-amber-100 text-amber-800 border-amber-200',
+        'Unpaid': 'bg-slate-100 text-slate-700 border-slate-200',
+        'Overdue': 'bg-rose-100 text-rose-800 border-rose-200',
+        'Completed': 'bg-emerald-100 text-emerald-800 border-emerald-200',
+        'In Progress': 'bg-sky-100 text-sky-800 border-sky-200',
+        'Pending': 'bg-amber-100 text-amber-800 border-amber-200',
+        'Cancelled': 'bg-slate-100 text-slate-600 border-slate-200'
+      };
+      const cls = map[status] || 'bg-slate-100 text-slate-700 border-slate-200';
+      return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${cls}">${status}</span>`;
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. AUTHENTICATION & ACCOUNT SWITCHING
+    // -------------------------------------------------------------------------
+    document.getElementById('login-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value.trim().toLowerCase();
+      const password = document.getElementById('login-password').value.trim();
+      const errEl = document.getElementById('login-error');
+
+      const account = db.accounts.find(a => a.username.toLowerCase() === username && a.password === password);
+      if (!account) {
+        errEl.textContent = 'Invalid credentials. Try "owner" / "owner" or any tenant username (e.g. "juan" / "juan").';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      errEl.classList.add('hidden');
+      loginAs(account);
+    });
+
+    function quickLogin(username) {
+      const account = db.accounts.find(a => a.username.toLowerCase() === username.toLowerCase());
+      if (account) loginAs(account);
+    }
+
+    function switchAccount(username) {
+      const account = db.accounts.find(a => a.username === username);
+      if (account) loginAs(account);
+    }
+
+    function loginAs(account) {
+      currentUser = account;
+      activeTab = account.user_role === 'Owner' ? 'overview' : 'my-portal';
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('app-shell').classList.remove('hidden');
+      populateAccountSwitcher();
+      renderApp();
+      const displayName = account.user_role === 'Owner'
+        ? `${db.owner.first_name} ${db.owner.last_name} (Owner)`
+        : `${getTenantFullName(getTenantById(account.tenant_id))} (Tenant)`;
+      showToast(`Signed in as ${displayName}`);
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById('app-shell').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('login-password').value = '';
+    }
+
+    function populateAccountSwitcher() {
+      const select = document.getElementById('quick-role-select');
+      let options = `<optgroup label="Administration">`;
+      const ownerAcc = db.accounts.find(a => a.user_role === 'Owner');
+      options += `<option value="${ownerAcc.username}" ${currentUser.username === ownerAcc.username ? 'selected' : ''}>Owner: Roberto Cruz</option>`;
+      options += `</optgroup><optgroup label="Tenants (${db.tenants.length})">`;
+      db.accounts.filter(a => a.user_role === 'Tenant').forEach(acc => {
+        const t = getTenantById(acc.tenant_id);
+        const assign = getActiveAssignmentForTenant(acc.tenant_id);
+        const room = assign ? getRoomById(assign.room_id) : null;
+        options += `<option value="${acc.username}" ${currentUser.username === acc.username ? 'selected' : ''}>
+          ${getTenantFullName(t)} (${room ? room.room_number : 'No Room'})
+        </option>`;
+      });
+      options += `</optgroup>`;
+      select.innerHTML = options;
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. NAVIGATION & VIEW ROUTER
+    // -------------------------------------------------------------------------
+    function renderApp() {
+      const roleBadge = document.getElementById('role-badge');
+      const navTabs = document.getElementById('nav-tabs');
+
+      if (currentUser.user_role === 'Owner') {
+        roleBadge.textContent = 'Owner / Admin';
+        roleBadge.className = 'px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded-full bg-blue-100 text-blue-800';
+
+        const ownerTabs = [
+          { id: 'overview', label: 'Dashboard Overview', icon: 'fa-chart-pie' },
+          { id: 'rooms', label: `Rooms (${db.rooms.length})`, icon: 'fa-door-open' },
+          { id: 'tenants', label: `Tenants (${db.tenants.length})`, icon: 'fa-users' },
+          { id: 'billing', label: 'Billing & Payments', icon: 'fa-file-invoice-dollar' },
+          { id: 'expenses', label: 'Expenses', icon: 'fa-receipt' },
+          { id: 'operations', label: 'Maintenance & Notices', icon: 'fa-screwdriver-wrench' }
+        ];
+
+        navTabs.innerHTML = ownerTabs.map(tab => `
+          <button onclick="setTab('${tab.id}')"
+            class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
+              activeTab === tab.id
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-blue-900 hover:bg-blue-100/60'
+            }">
+            <i class="fa-solid ${tab.icon}"></i>
+            <span>${tab.label}</span>
+          </button>
+        `).join('');
+
+        renderOwnerView();
+      } else {
+        roleBadge.textContent = 'Tenant Portal';
+        roleBadge.className = 'px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded-full bg-sky-100 text-sky-800';
+
+        const tenantTabs = [
+          { id: 'my-portal', label: 'My Room & Summary', icon: 'fa-house-user' },
+          { id: 'my-billing', label: 'My Bills & Receipts', icon: 'fa-file-invoice' },
+          { id: 'my-maintenance', label: 'Maintenance Requests', icon: 'fa-wrench' },
+          { id: 'my-announcements', label: 'Announcements', icon: 'fa-bullhorn' }
+        ];
+
+        navTabs.innerHTML = tenantTabs.map(tab => `
+          <button onclick="setTab('${tab.id}')"
+            class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
+              activeTab === tab.id
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-blue-900 hover:bg-blue-100/60'
+            }">
+            <i class="fa-solid ${tab.icon}"></i>
+            <span>${tab.label}</span>
+          </button>
+        `).join('');
+
+        renderTenantView();
+      }
+    }
+
+    function setTab(tabId) {
+      activeTab = tabId;
+      renderApp();
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. OWNER VIEWS
+    // -------------------------------------------------------------------------
+    function renderOwnerView() {
+      const main = document.getElementById('main-content');
+
+      // Calculate live KPIs
+      const totalRooms = db.rooms.length;
+      const activeTenants = db.tenants.filter(t => t.status === 'Active').length;
+      const collectedRevenue = db.payments.reduce((sum, p) => sum + Number(p.amount_paid), 0);
+      const totalExpenses = db.expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+      const totalCapacity = db.rooms.reduce((sum, r) => sum + Number(r.capacity), 0);
+      const totalOccupiedBeds = db.room_assignments.filter(a => !a.moveout_date).length;
+
+      if (activeTab === 'overview') {
+        const pendingMaintenance = db.maintenance_requests.filter(m => m.status === 'Pending' || m.status === 'In Progress');
+        const unpaidInvoices = db.billings.filter(b => b.payment_status !== 'Paid');
+
+        main.innerHTML = `
+          <div class="fade-in space-y-6">
+            <!-- Page Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Owner Dashboard</h1>
+                <p class="text-sm text-slate-500">Welcome back, <span class="font-semibold text-slate-700">Roberto Mendoza Cruz</span> • November 2026 Operations</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2.5">
+                <button onclick="openAddRoomModal()" class="px-4 py-2.5 bg-white border border-slate-300 hover:bg-blue-50 hover:border-blue-300 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center gap-1.5 shadow-2xs">
+                  <i class="fa-solid fa-plus text-blue-600"></i> Add Room
+                </button>
+                <button onclick="openRegisterTenantModal()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                  <i class="fa-solid fa-user-plus"></i> Register Tenant
+                </button>
+              </div>
+            </div>
+
+            <!-- 4 Summary KPI Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Rooms</span>
+                  <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <i class="fa-solid fa-door-open"></i>
+                  </div>
+                </div>
+                <div class="text-3xl font-extrabold text-slate-900">${totalRooms}</div>
+                <p class="text-xs text-slate-500 mt-1">
+                  <span class="font-semibold text-blue-700">${totalOccupiedBeds}/${totalCapacity}</span> beds occupied across property
+                </p>
+              </div>
+
+              <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Active Tenants</span>
+                  <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                    <i class="fa-solid fa-users"></i>
+                  </div>
+                </div>
+                <div class="text-3xl font-extrabold text-slate-900">${activeTenants}</div>
+                <p class="text-xs text-slate-500 mt-1">
+                  All active boarders registered in <code class="text-slate-700">tenant</code>
+                </p>
+              </div>
+
+              <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Collected Revenue</span>
+                  <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <i class="fa-solid fa-peso-sign"></i>
+                  </div>
+                </div>
+                <div class="text-2xl sm:text-3xl font-extrabold text-blue-700">${formatCurrency(collectedRevenue)}</div>
+                <p class="text-xs text-slate-500 mt-1">
+                  From <span class="font-semibold text-slate-700">${db.payments.length}</span> recorded payments (Nov 2026)
+                </p>
+              </div>
+
+              <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Monthly Expenses</span>
+                  <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                  </div>
+                </div>
+                <div class="text-2xl sm:text-3xl font-extrabold text-amber-700">${formatCurrency(totalExpenses)}</div>
+                <p class="text-xs text-slate-500 mt-1">
+                  Utilities, internet & repairs (${db.expenses.length} entries)
+                </p>
+              </div>
+            </div>
+
+            <!-- Middle Grid: Room Occupancy Snapshot & Actionable Billing -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+              <!-- Room Occupancy Snapshot -->
+              <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+                <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                  <div>
+                    <h2 class="font-bold text-slate-900 text-sm">Room Status & Occupancy</h2>
+                    <p class="text-xs text-slate-500">Live bed capacity across RM-101 to RM-402</p>
+                  </div>
+                  <button onclick="setTab('rooms')" class="text-xs font-semibold text-blue-600 hover:text-blue-800">
+                    Manage All &rarr;
+                  </button>
+                </div>
+                <div class="p-5 grid grid-cols-2 sm:grid-cols-5 gap-3">
+                  ${db.rooms.map(room => {
+                    const occ = getOccupancyCountForRoom(room.room_id);
+                    const statusRing = room.room_status === 'Maintenance'
+                      ? 'border-amber-300 bg-amber-50/60'
+                      : occ >= room.capacity || room.room_status === 'Occupied'
+                        ? 'border-blue-200 bg-blue-50/60'
+                        : 'border-sky-200 bg-sky-50/40';
+                    return `
+                      <div onclick="openEditRoomModal(${room.room_id})" class="cursor-pointer p-3.5 rounded-xl border ${statusRing} hover:shadow-sm transition">
+                        <div class="flex items-center justify-between mb-1">
+                          <span class="font-bold text-xs text-slate-900">${room.room_number}</span>
+                          <span class="text-[10px] font-bold text-slate-600">${occ}/${room.capacity}</span>
+                        </div>
+                        <div class="text-[11px] text-slate-500 truncate">${room.room_type}</div>
+                        <div class="mt-2">${badgeHTML(room.room_status)}</div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+
+              <!-- Pending Bills & Maintenance -->
+              <div class="lg:col-span-5 space-y-6">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+                  <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <h2 class="font-bold text-slate-900 text-sm">Unsettled Invoices (${unpaidInvoices.length})</h2>
+                    <button onclick="setTab('billing')" class="text-xs font-semibold text-blue-600 hover:text-blue-800">View Billing &rarr;</button>
+                  </div>
+                  <div class="divide-y divide-slate-100">
+                    ${unpaidInvoices.length === 0 ? `<p class="p-5 text-xs text-slate-500">All invoices are settled!</p>` : unpaidInvoices.map(inv => {
+                      const t = getTenantById(inv.tenant_id);
+                      const total = getBillingTotal(inv);
+                      const paid = getPaidAmountForBilling(inv.billing_id);
+                      const bal = total - paid;
+                      return `
+                        <div class="px-5 py-3 flex items-center justify-between gap-2">
+                          <div>
+                            <div class="text-xs font-bold text-slate-900">${getTenantFullName(t)} <span class="text-slate-400 font-normal">#${inv.billing_id}</span></div>
+                            <div class="text-[11px] text-slate-500">Due ${inv.due_date} • Bal: <span class="font-semibold text-slate-800">${formatCurrency(bal)}</span></div>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            ${badgeHTML(inv.payment_status)}
+                            <button onclick="openRecordPaymentModal(${inv.billing_id})" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold rounded-lg transition">
+                              Pay
+                            </button>
+                          </div>
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+                  <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <h2 class="font-bold text-slate-900 text-sm">Open Maintenance (${pendingMaintenance.length})</h2>
+                    <button onclick="setTab('operations')" class="text-xs font-semibold text-blue-600 hover:text-blue-800">Manage &rarr;</button>
+                  </div>
+                  <div class="divide-y divide-slate-100">
+                    ${pendingMaintenance.length === 0 ? `<p class="p-5 text-xs text-slate-500">No open maintenance requests.</p>` : pendingMaintenance.map(req => {
+                      const t = getTenantById(req.tenant_id);
+                      const r = getRoomById(req.room_id);
+                      return `
+                        <div class="px-5 py-3 flex items-center justify-between gap-3">
+                          <div>
+                            <div class="text-xs font-bold text-slate-900">${req.request_title}</div>
+                            <div class="text-[11px] text-slate-500">${r ? r.room_number : ''} • Reported by ${getTenantFullName(t)}</div>
+                          </div>
+                          <button onclick="completeMaintenance(${req.request_id})" class="px-2.5 py-1 bg-blue-100 hover:bg-blue-600 text-blue-900 hover:text-white text-[11px] font-semibold rounded-lg transition">
+                            Mark Done
+                          </button>
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      else if (activeTab === 'rooms') {
+        const filteredRooms = roomFilterStatus === 'All'
+          ? db.rooms
+          : db.rooms.filter(r => r.room_status === roomFilterStatus);
+
+        main.innerHTML = `
+          <div class="fade-in space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Rooms Management</h1>
+                <p class="text-sm text-slate-500">Configure room rates, bed capacity, and availability status.</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <div class="inline-flex rounded-xl bg-white border border-slate-200 p-1">
+                  ${['All', 'Available', 'Occupied', 'Maintenance'].map(st => `
+                    <button onclick="roomFilterStatus='${st}'; renderOwnerView();"
+                      class="px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                        roomFilterStatus === st ? 'bg-blue-950 text-white' : 'text-slate-600 hover:bg-blue-50'
+                      }">${st}</button>
+                  `).join('')}
+                </div>
+                <button onclick="openAddRoomModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-sm transition flex items-center gap-2">
+                  <i class="fa-solid fa-plus"></i> Add Room
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              ${filteredRooms.map(room => {
+                const assignments = db.room_assignments.filter(a => a.room_id === room.room_id && !a.moveout_date);
+                const occCount = assignments.length;
+                const pct = Math.min(100, Math.round((occCount / room.capacity) * 100));
+                const occupants = assignments.map(a => getTenantById(a.tenant_id)).filter(Boolean);
+
+                return `
+                  <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-5 flex flex-col justify-between hover:border-blue-300 transition">
+                    <div>
+                      <div class="flex items-start justify-between gap-2 mb-3">
+                        <div>
+                          <span class="text-xs font-semibold text-slate-400">ID #${room.room_id}</span>
+                          <h3 class="text-xl font-extrabold text-slate-900">${room.room_number}</h3>
+                          <span class="text-xs font-medium text-slate-500">${room.room_type}</span>
+                        </div>
+                        ${badgeHTML(room.room_status)}
+                      </div>
+
+                      <div class="my-4 p-3 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center justify-between">
+                        <div>
+                          <div class="text-[11px] text-slate-500 uppercase font-semibold">Monthly Rate</div>
+                          <div class="text-base font-extrabold text-blue-700">${formatCurrency(room.monthly_rate)}</div>
+                        </div>
+                        <div class="text-right">
+                          <div class="text-[11px] text-slate-500 uppercase font-semibold">Occupancy</div>
+                          <div class="text-base font-bold text-slate-900">${occCount} / ${room.capacity} <span class="text-xs font-normal text-slate-500">beds</span></div>
+                        </div>
+                      </div>
+
+                      <!-- Capacity Bar -->
+                      <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mb-4">
+                        <div class="bg-blue-600 h-full rounded-full transition-all" style="width: ${pct}%"></div>
+                      </div>
+
+                      <!-- Current Occupants List -->
+                      <div class="mb-4">
+                        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Current Boarders</div>
+                        ${occupants.length === 0
+                          ? `<p class="text-xs text-slate-400 italic">No tenants currently assigned</p>`
+                          : `<div class="flex flex-wrap gap-1.5">
+                              ${occupants.map(occ => `
+                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-medium">
+                                  <i class="fa-solid fa-user text-[9px] text-blue-500"></i> ${getTenantFullName(occ)}
+                                </span>
+                              `).join('')}
+                            </div>`
+                        }
+                      </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                      <button onclick="openEditRoomModal(${room.room_id})" class="w-full py-2 px-3 bg-slate-100 hover:bg-blue-50 hover:text-blue-800 text-slate-800 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Room / Status
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      else if (activeTab === 'tenants') {
+        const q = tenantSearchQuery.toLowerCase();
+        const filteredTenants = db.tenants.filter(t => {
+          const full = getTenantFullName(t).toLowerCase();
+          const assign = getActiveAssignmentForTenant(t.tenant_id);
+          const room = assign ? getRoomById(assign.room_id) : null;
+          const roomNum = room ? room.room_number.toLowerCase() : '';
+          return full.includes(q) || t.occupation.toLowerCase().includes(q) || roomNum.includes(q) || t.email.toLowerCase().includes(q);
+        });
+
+        main.innerHTML = `
+          <div class="fade-in space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Tenants Directory</h1>
+                <p class="text-sm text-slate-500">All ${db.tenants.length} registered boarders, room assignments, and emergency contacts.</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <div class="relative">
+                  <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                  <input type="text" value="${tenantSearchQuery}" oninput="tenantSearchQuery=this.value; renderOwnerView();"
+                    placeholder="Search name, room, occupation..."
+                    class="pl-8 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 w-64" />
+                </div>
+                <button onclick="openRegisterTenantModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-sm transition flex items-center gap-2">
+                  <i class="fa-solid fa-user-plus"></i> Register Tenant
+                </button>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-blue-50/60 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                      <th class="py-3.5 px-4">Tenant</th>
+                      <th class="py-3.5 px-4">Room Assignment</th>
+                      <th class="py-3.5 px-4">Occupation & Gender</th>
+                      <th class="py-3.5 px-4">Contact & Hometown</th>
+                      <th class="py-3.5 px-4">Status</th>
+                      <th class="py-3.5 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 text-xs">
+                    ${filteredTenants.map(t => {
+                      const assign = getActiveAssignmentForTenant(t.tenant_id);
+                      const room = assign ? getRoomById(assign.room_id) : null;
+                      return `
+                        <tr class="hover:bg-blue-50/30 transition">
+                          <td class="py-3.5 px-4">
+                            <div class="font-bold text-slate-900">${t.first_name} ${t.middle_name ? t.middle_name[0] + '.' : ''} ${t.last_name}</div>
+                            <div class="text-[11px] text-slate-500">${t.email} • ID #${t.tenant_id}</div>
+                          </td>
+                          <td class="py-3.5 px-4">
+                            ${room
+                              ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-800 font-bold border border-blue-200">
+                                  <i class="fa-solid fa-door-closed text-[10px]"></i> ${room.room_number}
+                                 </span>
+                                 <div class="text-[10px] text-slate-400 mt-0.5">Since ${assign.movein_date}</div>`
+                              : `<span class="text-slate-400 italic">Unassigned</span>`
+                            }
+                          </td>
+                          <td class="py-3.5 px-4">
+                            <div class="font-medium text-slate-800">${t.occupation}</div>
+                            <div class="text-[11px] text-slate-500">${t.gender} • Born ${t.birthdate}</div>
+                          </td>
+                          <td class="py-3.5 px-4">
+                            <div class="font-medium text-slate-800">${t.contact}</div>
+                            <div class="text-[11px] text-slate-500 truncate max-w-[240px]" title="${t.address}">${t.address}</div>
+                          </td>
+                          <td class="py-3.5 px-4">${badgeHTML(t.status)}</td>
+                          <td class="py-3.5 px-4 text-right">
+                            <button onclick="openTenantDetailModal(${t.tenant_id})" class="px-3 py-1.5 bg-slate-100 hover:bg-blue-100 hover:text-blue-900 text-slate-700 font-semibold rounded-lg transition">
+                              Details
+                            </button>
+                          </td>
+                        </tr>
+                      `;
+                    }).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      else if (activeTab === 'billing') {
+        main.innerHTML = `
+          <div class="fade-in space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Billing & Payments Tracker</h1>
+                <p class="text-sm text-slate-500">Itemized monthly statements (Rent, Water, Electricity, Internet) and official receipts.</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button onclick="openCreateInvoiceModal()" class="px-4 py-2 bg-white border border-slate-300 hover:bg-blue-50 text-slate-800 text-xs font-semibold rounded-xl transition flex items-center gap-2">
+                  <i class="fa-solid fa-file-circle-plus text-blue-600"></i> Create Invoice
+                </button>
+                <button onclick="openRecordPaymentModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-sm transition flex items-center gap-2">
+                  <i class="fa-solid fa-hand-holding-dollar"></i> Record Payment
+                </button>
+              </div>
+            </div>
+
+            <!-- Billing Invoices Table -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+              <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-blue-50/50">
+                <h2 class="font-bold text-slate-900 text-sm">Billing Statements (${db.billings.length})</h2>
+                <span class="text-xs text-slate-500">Period: Nov 1 – Nov 30, 2026</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                      <th class="py-3.5 px-4">Invoice ID</th>
+                      <th class="py-3.5 px-4">Tenant</th>
+                      <th class="py-3.5 px-4">Itemized Charges</th>
+                      <th class="py-3.5 px-4">Total / Paid</th>
+                      <th class="py-3.5 px-4">Due Date</th>
+                      <th class="py-3.5 px-4">Status</th>
+                      <th class="py-3.5 px-4 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 text-xs">
+                    ${db.billings.map(inv => {
+                      const t = getTenantById(inv.tenant_id);
+                      const total = getBillingTotal(inv);
+                      const paid = getPaidAmountForBilling(inv.billing_id);
+                      return `
+                        <tr class="hover:bg-blue-50/30 transition">
+                          <td class="py-3.5 px-4 font-bold text-slate-900">#${inv.billing_id}</td>
+                          <td class="py-3.5 px-4">
+                            <div class="font-bold text-slate-900">${getTenantFullName(t)}</div>
+                            <div class="text-[11px] text-slate-500">Tenant ID #${inv.tenant_id}</div>
+                          </td>
+                          <td class="py-3.5 px-4">
+                            <div class="flex flex-wrap gap-1.5">
+                              ${inv.details.map(d => `
+                                <span class="px-2 py-0.5 rounded-md bg-blue-50/80 text-blue-900 border border-blue-100 text-[11px]">
+                                  ${d.charge_type}: <strong class="font-semibold">${formatCurrency(d.amount)}</strong>
+                                </span>
+                              `).join('')}
+                            </div>
+                          </td>
+                          <td class="py-3.5 px-4">
+                            <div class="font-extrabold text-slate-900">${formatCurrency(total)}</div>
+                            <div class="text-[11px] text-blue-700 font-medium">Paid: ${formatCurrency(paid)}</div>
+                          </td>
+                          <td class="py-3.5 px-4 text-slate-600 font-medium">${inv.due_date}</td>
+                          <td class="py-3.5 px-4">${badgeHTML(inv.payment_status)}</td>
+                          <td class="py-3.5 px-4 text-right">
+                            ${inv.payment_status !== 'Paid'
+                              ? `<button onclick="openRecordPaymentModal(${inv.billing_id})" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
+                                  Record Payment
+                                 </button>`
+                              : `<span class="text-[11px] text-emerald-700 font-semibold"><i class="fa-solid fa-check-double"></i> Settled</span>`
+                            }
+                          </td>
+                        </tr>
+                      `;
+                    }).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Official Payment Receipts Log -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+              <div class="px-5 py-4 border-b border-slate-200 bg-blue-50/50">
+                <h2 class="font-bold text-slate-900 text-sm">Recorded Payments & Receipts (${db.payments.length})</h2>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                      <th class="py-3 px-4">Receipt #</th>
+                      <th class="py-3 px-4">Invoice #</th>
+                      <th class="py-3 px-4">Tenant</th>
+                      <th class="py-3 px-4">Method</th>
+                      <th class="py-3 px-4">Date</th>
+                      <th class="py-3 px-4 text-right">Amount Paid</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 text-xs">
+                    ${db.payments.map(p => {
+                      const inv = db.billings.find(b => b.billing_id === p.billing_id);
+                      const t = inv ? getTenantById(inv.tenant_id) : null;
+                      return `
+                        <tr class="hover:bg-blue-50/30">
+                          <td class="py-3 px-4 font-mono font-bold text-blue-700">${p.receipt_number}</td>
+                          <td class="py-3 px-4 font-semibold text-slate-700">#${p.billing_id}</td>
+                          <td class="py-3 px-4 font-medium text-slate-900">${getTenantFullName(t)}</td>
+                          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">${p.payment_method}</span></td>
+                          <td class="py-3 px-4 text-slate-500">${p.payment_date}</td>
+                          <td class="py-3 px-4 text-right font-extrabold text-slate-900">${formatCurrency(p.amount_paid)}</td>
+                        </tr>
+                      `;
+                    }).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      else if (activeTab === 'expenses') {
+        const totalExp = db.expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+        main.innerHTML = `
+          <div class="fade-in space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Property Expenses Log</h1>
+                <p class="text-sm text-slate-500">Operating utilities and maintenance expenses for Residentia (Total: <strong class="text-amber-700">${formatCurrency(totalExp)}</strong>)</p>
+              </div>
+              <button onclick="openLogExpenseModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-sm transition flex items-center gap-2 self-start sm:self-auto">
+                <i class="fa-solid fa-plus"></i> Log Expense
+              </button>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                      <th class="py-3.5 px-4">ID</th>
+                      <th class="py-3.5 px-4">Category</th>
+                      <th class="py-3.5 px-4">Description</th>
+                      <th class="py-3.5 px-4">Expense Date</th>
+                      <th class="py-3.5 px-4 text-right">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 text-xs">
+                    ${db.expenses.map(exp => `
+                      <tr class="hover:bg-slate-50/80 transition">
+                        <td class="py-3.5 px-4 font-mono text-slate-500">#${exp.expense_id}</td>
+                        <td class="py-3.5 px-4">
+                          <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 font-semibold">
+                            ${exp.expense_category}
+                          </span>
+                        </td>
+                        <td class="py-3.5 px-4 font-medium text-slate-800">${exp.description}</td>
+                        <td class="py-3.5 px-4 text-slate-500">${exp.expense_date}</td>
+                        <td class="py-3.5 px-4 text-right font-extrabold text-slate-900">${formatCurrency(exp.amount)}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                  <tfoot>
+                    <tr class="bg-slate-50 border-t border-slate-200 font-bold text-xs">
+                      <td colspan="4" class="py-3.5 px-4 text-right text-slate-600 uppercase tracking-wider">Total Operating Expenses:</td>
+                      <td class="py-3.5 px-4 text-right text-base font-extrabold text-amber-700">${formatCurrency(totalExp)}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      else if (activeTab === 'operations') {
+        main.innerHTML = `
+          <div class="fade-in space-y-6">
+            <div>
+              <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Maintenance & Announcements</h1>
+              <p class="text-sm text-slate-500">Resolve tenant repair tickets and broadcast property-wide notices.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <!-- Maintenance Requests Column -->
+              <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+                <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/70 flex items-center justify-between">
+                  <h2 class="font-bold text-slate-900 text-sm">Maintenance Requests (${db.maintenance_requests.length})</h2>
+                </div>
+                <div class="divide-y divide-slate-100">
+                  ${db.maintenance_requests.map(req => {
+                    const t = getTenantById(req.tenant_id);
+                    const r = getRoomById(req.room_id);
+                    return `
+                      <div class="p-5 space-y-3">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <div class="flex items-center gap-2">
+                              <span class="font-bold text-sm text-slate-900">${req.request_title}</span>
+                              ${badgeHTML(req.status)}
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1">${req.request_description}</p>
+                          </div>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-[11px] text-slate-500">
+                          <div>
+                            <span class="font-semibold text-slate-700">${r ? r.room_number : 'Room'}</span> • Reported by <span class="font-semibold text-slate-700">${getTenantFullName(t)}</span> on ${req.request_date}
+                            ${req.completion_date ? ` • Completed ${req.completion_date}` : ''}
+                          </div>
+                          <div class="flex items-center gap-1.5">
+                            ${req.status !== 'Completed' ? `
+                              <button onclick="updateMaintenanceStatus(${req.request_id}, 'In Progress')" class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold rounded-lg transition">In Progress</button>
+                              <button onclick="completeMaintenance(${req.request_id})" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition">Complete</button>
+                            ` : `<span class="text-emerald-700 font-semibold"><i class="fa-solid fa-circle-check"></i> Resolved</span>`}
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+
+              <!-- Announcements Publisher & Feed -->
+              <div class="lg:col-span-5 space-y-6">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-5">
+                  <h2 class="font-bold text-slate-900 text-sm mb-3">Publish New Announcement</h2>
+                  <form onsubmit="handlePublishAnnouncement(event)" class="space-y-3">
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-600 mb-1">Notice Title</label>
+                      <input type="text" id="ann-title" required placeholder="e.g. Monthly General Cleaning"
+                        class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-600 mb-1">Message</label>
+                      <textarea id="ann-message" rows="3" required placeholder="Write announcement details for tenants..."
+                        class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition flex items-center justify-center gap-2">
+                      <i class="fa-solid fa-paper-plane"></i> Broadcast to All Active Tenants
+                    </button>
+                  </form>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+                  <div class="px-5 py-4 border-b border-slate-200 bg-blue-50/50">
+                    <h2 class="font-bold text-slate-900 text-sm">Published Notices (${db.announcements.length})</h2>
+                  </div>
+                  <div class="divide-y divide-slate-100">
+                    ${db.announcements.slice().reverse().map(ann => `
+                      <div class="p-4">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                          <h3 class="font-bold text-xs text-slate-900">${ann.announcement_title}</h3>
+                          <span class="text-[11px] text-slate-400">${ann.date_published}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">${ann.announcement_message}</p>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 7. TENANT PORTAL VIEWS (Filtered dynamically by logged-in tenant)
+    // -------------------------------------------------------------------------
+    function renderTenantView() {
+      const main = document.getElementById('main-content');
+      const tenant = getTenantById(currentUser.tenant_id);
+      const assignment = getActiveAssignmentForTenant(tenant.tenant_id);
+      const room = assignment ? getRoomById(assignment.room_id) : null;
+      const myBills = db.billings.filter(b => b.tenant_id === tenant.tenant_id);
+      const myRequests = db.maintenance_requests.filter(m => m.tenant_id === tenant.tenant_id);
+
+      if (activeTab === 'my-portal') {
+        const unpaidTotal = myBills.reduce((sum, b) => sum + (getBillingTotal(b) - getPaidAmountForBilling(b.billing_id)), 0);
+
+        main.innerHTML = `
+          <div class="fade-in space-y-6">
+            <!-- Welcome Banner -->
+            <div class="bg-gradient-to-r from-slate-950 via-blue-900 to-blue-800 text-white rounded-2xl p-6 sm:p-8 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <div class="inline-flex items-center gap-2 bg-white/15 px-3 py-1 rounded-full text-xs font-semibold mb-3 text-sky-200">
+                  <i class="fa-solid fa-id-badge"></i> Tenant ID #${tenant.tenant_id} • ${tenant.occupation}
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Welcome, ${tenant.first_name} ${tenant.last_name}!</h1>
+                <p class="text-blue-200 text-xs sm:text-sm mt-1">
+                  Residentia Boarding House • ${db.boarding_house.address.barangay}, ${db.boarding_house.address.municipality}
+                </p>
+              </div>
+              <div class="bg-white/10 backdrop-blur-xs border border-white/20 rounded-xl p-4 text-left sm:text-right shrink-0">
+                <div class="text-[11px] uppercase tracking-wider text-sky-200 font-semibold">Current Balance Due</div>
+                <div class="text-2xl font-extrabold mt-0.5">${formatCurrency(unpaidTotal)}</div>
+                <button onclick="setTab('my-billing')" class="mt-2 text-xs font-semibold underline text-sky-200 hover:text-white">
+                  View Billing Statements &rarr;
+                </button>
+              </div>
+            </div>
+
+            <!-- Room & Lease Details + Owner Contact -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-2xs p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="font-bold text-slate-900 text-base">My Room & Lease Details</h2>
+                  ${room ? badgeHTML(room.room_status) : ''}
+                </div>
+
+                ${room ? `
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-blue-50/50 rounded-xl border border-blue-100 mb-5">
+                    <div>
+                      <div class="text-[11px] font-semibold uppercase text-slate-400">Room Number</div>
+                      <div class="text-lg font-extrabold text-slate-900 mt-0.5">${room.room_number}</div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] font-semibold uppercase text-slate-400">Room Type</div>
+                      <div class="text-sm font-bold text-slate-800 mt-1">${room.room_type}</div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] font-semibold uppercase text-slate-400">Monthly Rate</div>
+                      <div class="text-sm font-extrabold text-blue-700 mt-1">${formatCurrency(room.monthly_rate)}</div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] font-semibold uppercase text-slate-400">Move-in Date</div>
+                      <div class="text-sm font-bold text-slate-800 mt-1">${assignment.movein_date}</div>
+                    </div>
+                  </div>
+                ` : `<p class="text-sm text-slate-500 mb-4">No active room assignment on record.</p>`}
+
+                <div class="space-y-2.5 text-xs border-t border-slate-100 pt-4">
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">Registered Email:</span>
+                    <span class="font-semibold text-slate-800">${tenant.email}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">Contact Number:</span>
+                    <span class="font-semibold text-slate-800">${tenant.contact}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">Home Address:</span>
+                    <span class="font-semibold text-slate-800">${tenant.address}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">Emergency Contact:</span>
+                    <span class="font-semibold text-slate-800">${tenant.emergency.name} (${tenant.emergency.rel}) • ${tenant.emergency.phone}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Property Owner Contact & Recent Notices -->
+              <div class="lg:col-span-5 space-y-6">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6">
+                  <h2 class="font-bold text-slate-900 text-base mb-3">Landlord / Owner Contact</h2>
+                  <div class="flex items-center gap-3.5 p-3.5 rounded-xl bg-blue-50/70 border border-blue-200">
+                    <div class="w-11 h-11 rounded-xl bg-blue-700 text-white flex items-center justify-center font-bold text-sm shrink-0">
+                      RC
+                    </div>
+                    <div>
+                      <div class="font-bold text-sm text-slate-900">${db.owner.first_name} ${db.owner.middle_name} ${db.owner.last_name}</div>
+                      <div class="text-xs text-blue-800 font-medium mt-0.5">
+                        <i class="fa-solid fa-phone mr-1"></i> ${db.owner.contacts.join(' / ')}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6">
+                  <div class="flex items-center justify-between mb-3">
+                    <h2 class="font-bold text-slate-900 text-base">Latest Announcements</h2>
+                    <button onclick="setTab('my-announcements')" class="text-xs font-semibold text-blue-600">All &rarr;</button>
+                  </div>
+                  <div class="space-y-3">
+                    ${db.announcements.slice().reverse().slice(0, 2).map(ann => `
+                      <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                          <span class="font-bold text-xs text-slate-900">${ann.announcement_title}</span>
+                          <span class="text-[10px] text-slate-400">${ann.date_published}</span>
+                        </div>
+                        <p class="text-xs text-slate-600">${ann.announcement_message}</p>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      else if (activeTab === 'my-billing') {
+        const myPayments = db.payments.filter(p => myBills.some(b => b.billing_id === p.billing_id));
+
+        main.innerHTML = `
+          <div class="fade-in space-y-6">
+            <div>
+              <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">My Billing & Receipts</h1>
+              <p class="text-sm text-slate-500">Itemized monthly charges and official payment history for ${getTenantFullName(tenant)}.</p>
+            </div>
+
+            ${myBills.length === 0 ? `
+              <div class="bg-white rounded-2xl border border-slate-200 p-8 text-center">
+                <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3">
+                  <i class="fa-solid fa-file-invoice text-lg"></i>
+                </div>
+                <h3 class="font-bold text-slate-900 text-sm">No Billing Statements Yet</h3>
+                <p class="text-xs text-slate-500 mt-1">You currently have no generated invoices in the system.</p>
+              </div>
+            ` : `
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                ${myBills.map(inv => {
+                  const total = getBillingTotal(inv);
+                  const paid = getPaidAmountForBilling(inv.billing_id);
+                  const bal = total - paid;
+                  return `
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6">
+                      <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+                        <div>
+                          <span class="text-xs font-semibold text-slate-400">Invoice #${inv.billing_id}</span>
+                          <h3 class="font-bold text-slate-900 text-sm">${inv.billing_start_date} to ${inv.billing_end_date}</h3>
+                          <p class="text-[11px] text-slate-500">Due Date: <strong class="text-slate-700">${inv.due_date}</strong></p>
+                        </div>
+                        ${badgeHTML(inv.payment_status)}
+                      </div>
+
+                      <div class="space-y-2 mb-4">
+                        ${inv.details.map(d => `
+                          <div class="flex justify-between text-xs">
+                            <span class="text-slate-600">${d.charge_type}</span>
+                            <span class="font-semibold text-slate-900">${formatCurrency(d.amount)}</span>
+                          </div>
+                        `).join('')}
+                      </div>
+
+                      <div class="pt-3 border-t border-slate-200 space-y-1 text-xs">
+                        <div class="flex justify-between font-bold text-slate-900 text-sm">
+                          <span>Total Amount</span>
+                          <span>${formatCurrency(total)}</span>
+                        </div>
+                        <div class="flex justify-between text-emerald-700 font-medium">
+                          <span>Amount Paid</span>
+                          <span>${formatCurrency(paid)}</span>
+                        </div>
+                        <div class="flex justify-between text-rose-700 font-bold">
+                          <span>Remaining Balance</span>
+                          <span>${formatCurrency(bal)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `}
+
+            <!-- Payment History -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+              <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/70">
+                <h2 class="font-bold text-slate-900 text-sm">My Payment Receipts (${myPayments.length})</h2>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                      <th class="py-3 px-4">Receipt #</th>
+                      <th class="py-3 px-4">Invoice #</th>
+                      <th class="py-3 px-4">Payment Method</th>
+                      <th class="py-3 px-4">Date</th>
+                      <th class="py-3 px-4 text-right">Amount Paid</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 text-xs">
+                    ${myPayments.length === 0 ? `
+                      <tr><td colspan="5" class="py-6 px-4 text-center text-slate-500">No payments recorded yet.</td></tr>
+                    ` : myPayments.map(p => `
+                      <tr>
+                        <td class="py-3 px-4 font-mono font-bold text-emerald-700">${p.receipt_number}</td>
+                        <td class="py-3 px-4 font-semibold">#${p.billing_id}</td>
+                        <td class="py-3 px-4">${p.payment_method}</td>
+                        <td class="py-3 px-4 text-slate-500">${p.payment_date}</td>
+                        <td class="py-3 px-4 text-right font-extrabold text-slate-900">${formatCurrency(p.amount_paid)}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      else if (activeTab === 'my-maintenance') {
+        main.innerHTML = `
+          <div class="fade-in space-y-6">
+            <div>
+              <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Maintenance Requests</h1>
+              <p class="text-sm text-slate-500">Submit a repair issue for your room (${room ? room.room_number : 'Unassigned'}) and track resolution status.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <!-- Submit Form -->
+              <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-2xs p-6 self-start">
+                <h2 class="font-bold text-slate-900 text-sm mb-4">Submit New Repair Ticket</h2>
+                <form onsubmit="handleTenantMaintenanceSubmit(event)" class="space-y-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Room</label>
+                    <input type="text" disabled value="${room ? room.room_number + ' (' + room.room_type + ')' : 'No Assigned Room'}"
+                      class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-600 font-semibold" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Issue Title</label>
+                    <input type="text" id="req-title" required placeholder="e.g. Broken Door Lock or Weak Wi-Fi"
+                      class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Description</label>
+                    <textarea id="req-desc" rows="3" required placeholder="Describe the issue clearly..."
+                      class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                  </div>
+                  <button type="submit" ${!room ? 'disabled' : ''}
+                    class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white text-xs font-semibold rounded-xl shadow-xs transition">
+                    Submit Maintenance Request
+                  </button>
+                </form>
+              </div>
+
+              <!-- Personal Tracker -->
+              <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+                <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/70">
+                  <h2 class="font-bold text-slate-900 text-sm">My Submitted Requests (${myRequests.length})</h2>
+                </div>
+                <div class="divide-y divide-slate-100">
+                  ${myRequests.length === 0 ? `
+                    <p class="p-6 text-xs text-slate-500">You have not submitted any maintenance requests yet.</p>
+                  ` : myRequests.slice().reverse().map(req => {
+                    const r = getRoomById(req.room_id);
+                    return `
+                      <div class="p-5">
+                        <div class="flex items-center justify-between gap-2 mb-1.5">
+                          <h3 class="font-bold text-sm text-slate-900">${req.request_title}</h3>
+                          ${badgeHTML(req.status)}
+                        </div>
+                        <p class="text-xs text-slate-600 mb-2">${req.request_description}</p>
+                        <div class="text-[11px] text-slate-400">
+                          Ticket #${req.request_id} • Room ${r ? r.room_number : ''} • Submitted ${req.request_date}
+                          ${req.completion_date ? ` • Completed on ${req.completion_date}` : ''}
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      else if (activeTab === 'my-announcements') {
+        main.innerHTML = `
+          <div class="fade-in space-y-6">
+            <div>
+              <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Boarding House Announcements</h1>
+              <p class="text-sm text-slate-500">Official advisories and reminders from Owner Roberto Mendoza Cruz.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              ${db.announcements.slice().reverse().map(ann => `
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6">
+                  <div class="flex items-center justify-between gap-2 mb-2">
+                    <span class="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[11px] font-bold">
+                      <i class="fa-solid fa-bullhorn mr-1"></i> Notice #${ann.announcement_id}
+                    </span>
+                    <span class="text-xs text-slate-400">${ann.date_published}</span>
+                  </div>
+                  <h3 class="font-bold text-base text-slate-900 mb-2">${ann.announcement_title}</h3>
+                  <p class="text-xs text-slate-600 leading-relaxed">${ann.announcement_message}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 8. INTERACTIVE MODALS & CRUD HANDLERS
+    // -------------------------------------------------------------------------
+    function openModal(title, bodyHTML) {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-body').innerHTML = bodyHTML;
+      document.getElementById('modal-backdrop').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-backdrop').classList.add('hidden');
+    }
+
+    // Close modal on outside click
+    document.getElementById('modal-backdrop').addEventListener('click', function (e) {
+      if (e.target === this) closeModal();
+    });
+
+    // --- Add Room Modal ---
+    function openAddRoomModal() {
+      openModal('Add New Room', `
+        <form onsubmit="handleAddRoom(event)" class="space-y-4 text-xs">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Room Number</label>
+              <input type="text" id="new-room-num" required placeholder="e.g. RM-403"
+                class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Room Type</label>
+              <select id="new-room-type" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                <option value="Solo Room">Solo Room</option>
+                <option value="Bedspace">Bedspace</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Bed Capacity</label>
+              <input type="number" id="new-room-cap" min="1" max="12" value="1" required
+                class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Monthly Rate (₱)</label>
+              <input type="number" id="new-room-rate" min="500" step="100" value="5000" required
+                class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Initial Status</label>
+            <select id="new-room-status" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <option value="Available">Available</option>
+              <option value="Occupied">Occupied</option>
+              <option value="Maintenance">Maintenance</option>
+            </select>
+          </div>
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold">Cancel</button>
+            <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold">Save Room</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function handleAddRoom(e) {
+      e.preventDefault();
+      const roomNum = document.getElementById('new-room-num').value.trim().toUpperCase();
+      if (db.rooms.some(r => r.room_number.toUpperCase() === roomNum)) {
+        showToast(`Room ${roomNum} already exists!`, 'error');
+        return;
+      }
+      const nextId = Math.max(...db.rooms.map(r => r.room_id), 1200) + 1;
+      db.rooms.push({
+        room_id: nextId,
+        bh_id: 1101,
+        room_number: roomNum,
+        room_type: document.getElementById('new-room-type').value,
+        capacity: Number(document.getElementById('new-room-cap').value),
+        monthly_rate: Number(document.getElementById('new-room-rate').value),
+        room_status: document.getElementById('new-room-status').value
+      });
+      db.boarding_house.total_rooms = db.rooms.length;
+      saveDB();
+      closeModal();
+      renderApp();
+      showToast(`Added room ${roomNum} successfully.`);
+    }
+
+    // --- Edit Room Status Modal ---
+    function openEditRoomModal(roomId) {
+      const room = getRoomById(roomId);
+      if (!room) return;
+      openModal(`Edit Room ${room.room_number}`, `
+        <form onsubmit="handleEditRoom(event, ${room.room_id})" class="space-y-4 text-xs">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Room Type</label>
+              <select id="edit-room-type" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                <option value="Solo Room" ${room.room_type === 'Solo Room' ? 'selected' : ''}>Solo Room</option>
+                <option value="Bedspace" ${room.room_type === 'Bedspace' ? 'selected' : ''}>Bedspace</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Status</label>
+              <select id="edit-room-status" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                <option value="Available" ${room.room_status === 'Available' ? 'selected' : ''}>Available</option>
+                <option value="Occupied" ${room.room_status === 'Occupied' ? 'selected' : ''}>Occupied</option>
+                <option value="Maintenance" ${room.room_status === 'Maintenance' ? 'selected' : ''}>Maintenance</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Capacity</label>
+              <input type="number" id="edit-room-cap" min="1" max="12" value="${room.capacity}" required
+                class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Monthly Rate (₱)</label>
+              <input type="number" id="edit-room-rate" min="500" step="100" value="${room.monthly_rate}" required
+                class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+          </div>
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold">Cancel</button>
+            <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold">Update Room</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function handleEditRoom(e, roomId) {
+      e.preventDefault();
+      const room = getRoomById(roomId);
+      room.room_type = document.getElementById('edit-room-type').value;
+      room.room_status = document.getElementById('edit-room-status').value;
+      room.capacity = Number(document.getElementById('edit-room-cap').value);
+      room.monthly_rate = Number(document.getElementById('edit-room-rate').value);
+      saveDB();
+      closeModal();
+      renderApp();
+      showToast(`Updated ${room.room_number} settings.`);
+    }
+
+    // --- Register Tenant Modal ---
+    function openRegisterTenantModal() {
+      const availableRooms = db.rooms.filter(r => r.room_status !== 'Maintenance' && getOccupancyCountForRoom(r.room_id) < r.capacity);
+      openModal('Register New Tenant', `
+        <form onsubmit="handleRegisterTenant(event)" class="space-y-3.5 text-xs">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">First Name</label>
+              <input type="text" id="t-fname" required placeholder="e.g. Rafael" class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Last Name</label>
+              <input type="text" id="t-lname" required placeholder="e.g. Santos" class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Email</label>
+              <input type="email" id="t-email" required placeholder="rafael.santos@gmail.com" class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Contact Number</label>
+              <input type="text" id="t-phone" required placeholder="09181110099" class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Gender</label>
+              <select id="t-gender" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Birthdate</label>
+              <input type="date" id="t-bday" value="2003-01-15" required class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Occupation</label>
+              <input type="text" id="t-occ" required placeholder="Student" class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Home Address</label>
+            <input type="text" id="t-addr" required placeholder="Barangay Centro, Legazpi City, Albay" class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Assign Room (Available Slots)</label>
+            <select id="t-room" required class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+              ${availableRooms.map(r => {
+                const occ = getOccupancyCountForRoom(r.room_id);
+                return `<option value="${r.room_id}">${r.room_number} — ${r.room_type} (${occ}/${r.capacity} occupied • ${formatCurrency(r.monthly_rate)}/mo)</option>`;
+              }).join('')}
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-3 pt-1 border-t border-slate-100">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Emergency Contact Name</label>
+              <input type="text" id="t-ec-name" required placeholder="Parent / Guardian" class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Emergency Phone</label>
+              <input type="text" id="t-ec-phone" required placeholder="09178880099" class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+          </div>
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold">Cancel</button>
+            <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold">Register & Assign</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function handleRegisterTenant(e) {
+      e.preventDefault();
+      const nextTenantId = Math.max(...db.tenants.map(t => t.tenant_id), 1300) + 1;
+      const fname = document.getElementById('t-fname').value.trim();
+      const lname = document.getElementById('t-lname').value.trim();
+      const roomId = Number(document.getElementById('t-room').value);
+
+      db.tenants.push({
+        tenant_id: nextTenantId,
+        first_name: fname,
+        middle_name: '',
+        last_name: lname,
+        email: document.getElementById('t-email').value.trim(),
+        gender: document.getElementById('t-gender').value,
+        birthdate: document.getElementById('t-bday').value,
+        occupation: document.getElementById('t-occ').value.trim(),
+        status: 'Active',
+        contact: document.getElementById('t-phone').value.trim(),
+        address: document.getElementById('t-addr').value.trim(),
+        emergency: {
+          name: document.getElementById('t-ec-name').value.trim(),
+          rel: 'Guardian',
+          phone: document.getElementById('t-ec-phone').value.trim()
+        }
+      });
+
+      const nextAssignId = Math.max(...db.room_assignments.map(a => a.assignment_id), 1500) + 1;
+      db.room_assignments.push({
+        assignment_id: nextAssignId,
+        tenant_id: nextTenantId,
+        room_id: roomId,
+        movein_date: '2026-11-13',
+        moveout_date: null
+      });
+
+      // Auto-create login account for new tenant
+      const uname = fname.toLowerCase().replace(/[^a-z0-9]/g, '') + nextTenantId;
+      db.accounts.push({
+        account_id: Math.max(...db.accounts.map(a => a.account_id), 1400) + 1,
+        tenant_id: nextTenantId,
+        owner_id: null,
+        username: uname,
+        password: uname,
+        user_role: 'Tenant'
+      });
+
+      // Update room status if full
+      const room = getRoomById(roomId);
+      if (room && getOccupancyCountForRoom(roomId) >= room.capacity) {
+        room.room_status = 'Occupied';
+      }
+
+      saveDB();
+      populateAccountSwitcher();
+      closeModal();
+      renderApp();
+      showToast(`Registered ${fname} ${lname} (login: ${uname}).`);
+    }
+
+    // --- Tenant Details Modal ---
+    function openTenantDetailModal(tenantId) {
+      const t = getTenantById(tenantId);
+      const assign = getActiveAssignmentForTenant(tenantId);
+      const room = assign ? getRoomById(assign.room_id) : null;
+      const acc = db.accounts.find(a => a.tenant_id === tenantId);
+
+      openModal(`Tenant Profile — #${t.tenant_id}`, `
+        <div class="space-y-4 text-xs">
+          <div class="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <div>
+              <div class="text-base font-extrabold text-slate-900">${t.first_name} ${t.middle_name} ${t.last_name}</div>
+              <div class="text-slate-500">${t.occupation} • ${t.gender} • Born ${t.birthdate}</div>
+            </div>
+            ${badgeHTML(t.status)}
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="text-slate-400 font-semibold uppercase text-[10px]">Assigned Room</div>
+              <div class="font-bold text-slate-900 mt-0.5">${room ? room.room_number + ' (' + room.room_type + ')' : 'Unassigned'}</div>
+            </div>
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="text-slate-400 font-semibold uppercase text-[10px]">Portal Username</div>
+              <div class="font-mono font-bold text-emerald-700 mt-0.5">${acc ? acc.username : 'N/A'}</div>
+            </div>
+          </div>
+          <div class="space-y-2 border-t border-slate-100 pt-3">
+            <div><span class="text-slate-500">Email:</span> <strong class="text-slate-800">${t.email}</strong></div>
+            <div><span class="text-slate-500">Phone:</span> <strong class="text-slate-800">${t.contact}</strong></div>
+            <div><span class="text-slate-500">Permanent Address:</span> <strong class="text-slate-800">${t.address}</strong></div>
+            <div><span class="text-slate-500">Emergency Contact:</span> <strong class="text-slate-800">${t.emergency.name} (${t.emergency.rel}) — ${t.emergency.phone}</strong></div>
+          </div>
+        </div>
+      `);
+    }
+
+    // --- Record Payment Modal ---
+    function openRecordPaymentModal(preselectBillingId = null) {
+      const openBills = db.billings.filter(b => b.payment_status !== 'Paid');
+      if (openBills.length === 0) {
+        showToast('All existing invoices are already fully paid!', 'info');
+        return;
+      }
+
+      const selectedBill = preselectBillingId
+        ? openBills.find(b => b.billing_id === Number(preselectBillingId)) || openBills[0]
+        : openBills[0];
+      const defaultBal = getBillingTotal(selectedBill) - getPaidAmountForBilling(selectedBill.billing_id);
+
+      openModal('Record Tenant Payment', `
+        <form onsubmit="handleRecordPayment(event)" class="space-y-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Select Invoice</label>
+            <select id="pay-billing-id" onchange="updatePaymentDefaultAmount()" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+              ${openBills.map(b => {
+                const t = getTenantById(b.tenant_id);
+                const bal = getBillingTotal(b) - getPaidAmountForBilling(b.billing_id);
+                return `<option value="${b.billing_id}" data-bal="${bal}" ${b.billing_id === selectedBill.billing_id ? 'selected' : ''}>
+                  #${b.billing_id} — ${getTenantFullName(t)} (Balance: ${formatCurrency(bal)})
+                </option>`;
+              }).join('')}
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Amount Paid (₱)</label>
+              <input type="number" id="pay-amount" step="0.01" min="1" value="${defaultBal.toFixed(2)}" required
+                class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Payment Method</label>
+              <select id="pay-method" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                <option value="GCash">GCash</option>
+                <option value="Cash">Cash</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Official Receipt Number</label>
+            <input type="text" id="pay-receipt" value="OR-202611${String(db.payments.length + 1).padStart(2, '0')}" required
+              class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono" />
+          </div>
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold">Cancel</button>
+            <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold">Save Payment</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function updatePaymentDefaultAmount() {
+      const sel = document.getElementById('pay-billing-id');
+      const opt = sel.options[sel.selectedIndex];
+      document.getElementById('pay-amount').value = Number(opt.dataset.bal).toFixed(2);
+    }
+
+    function handleRecordPayment(e) {
+      e.preventDefault();
+      const billingId = Number(document.getElementById('pay-billing-id').value);
+      const amount = Number(document.getElementById('pay-amount').value);
+      const method = document.getElementById('pay-method').value;
+      const receipt = document.getElementById('pay-receipt').value.trim();
+
+      const nextPayId = Math.max(...db.payments.map(p => p.payment_id), 1900) + 1;
+      db.payments.push({
+        payment_id: nextPayId,
+        owner_id: 1001,
+        billing_id: billingId,
+        payment_method: method,
+        receipt_number: receipt,
+        payment_date: '2026-11-13',
+        amount_paid: amount
+      });
+
+      const bill = db.billings.find(b => b.billing_id === billingId);
+      const total = getBillingTotal(bill);
+      const totalPaid = getPaidAmountForBilling(billingId);
+      bill.payment_status = totalPaid >= total ? 'Paid' : 'Partial';
+
+      saveDB();
+      closeModal();
+      renderApp();
+      showToast(`Recorded payment ${receipt} (${formatCurrency(amount)}).`);
+    }
+
+    // --- Create Invoice Modal ---
+    function openCreateInvoiceModal() {
+      openModal('Create Monthly Billing Statement', `
+        <form onsubmit="handleCreateInvoice(event)" class="space-y-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Tenant</label>
+            <select id="inv-tenant" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+              ${db.tenants.map(t => {
+                const assign = getActiveAssignmentForTenant(t.tenant_id);
+                const r = assign ? getRoomById(assign.room_id) : null;
+                return `<option value="${t.tenant_id}" data-rate="${r ? r.monthly_rate : 2500}">
+                  ${getTenantFullName(t)} (${r ? r.room_number : 'No Room'})
+                </option>`;
+              }).join('')}
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Rent Charge (₱)</label>
+              <input type="number" id="inv-rent" value="5000" min="0" step="50" required class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Electricity (₱)</label>
+              <input type="number" id="inv-elec" value="350" min="0" step="10" required class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Water (₱)</label>
+              <input type="number" id="inv-water" value="150" min="0" step="10" required class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Internet (₱)</label>
+              <input type="number" id="inv-net" value="200" min="0" step="10" required class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Due Date</label>
+            <input type="date" id="inv-due" value="2026-11-25" required class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+          </div>
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold">Cancel</button>
+            <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold">Generate Invoice</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function handleCreateInvoice(e) {
+      e.preventDefault();
+      const nextBillId = Math.max(...db.billings.map(b => b.billing_id), 1800) + 1;
+      const details = [];
+      const rent = Number(document.getElementById('inv-rent').value);
+      const water = Number(document.getElementById('inv-water').value);
+      const elec = Number(document.getElementById('inv-elec').value);
+      const net = Number(document.getElementById('inv-net').value);
+
+      if (rent > 0) details.push({ billing_details_id: Date.now() + 1, charge_type: 'Rent', amount: rent });
+      if (water > 0) details.push({ billing_details_id: Date.now() + 2, charge_type: 'Water', amount: water });
+      if (elec > 0) details.push({ billing_details_id: Date.now() + 3, charge_type: 'Electricity', amount: elec });
+      if (net > 0) details.push({ billing_details_id: Date.now() + 4, charge_type: 'Internet', amount: net });
+
+      db.billings.push({
+        billing_id: nextBillId,
+        owner_id: 1001,
+        tenant_id: Number(document.getElementById('inv-tenant').value),
+        billing_start_date: '2026-11-01',
+        billing_end_date: '2026-11-30',
+        due_date: document.getElementById('inv-due').value,
+        payment_status: 'Unpaid',
+        details
+      });
+
+      saveDB();
+      closeModal();
+      renderApp();
+      showToast(`Created Invoice #${nextBillId}.`);
+    }
+
+    // --- Log Expense Modal ---
+    function openLogExpenseModal() {
+      openModal('Log Boarding House Expense', `
+        <form onsubmit="handleLogExpense(event)" class="space-y-4 text-xs">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Category</label>
+              <select id="exp-cat" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                <option value="Electricity">Electricity</option>
+                <option value="Water">Water</option>
+                <option value="Internet">Internet</option>
+                <option value="Repair & Maintenance">Repair & Maintenance</option>
+                <option value="Supplies">Supplies</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Amount (₱)</label>
+              <input type="number" id="exp-amt" step="0.01" min="1" required placeholder="1500.00"
+                class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Description</label>
+            <input type="text" id="exp-desc" required placeholder="e.g. Cleaning supplies & LED bulbs"
+              class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Expense Date</label>
+            <input type="date" id="exp-date" value="2026-11-13" required class="w-full px-3 py-2 border border-slate-300 rounded-xl" />
+          </div>
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold">Cancel</button>
+            <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold">Log Expense</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function handleLogExpense(e) {
+      e.preventDefault();
+      const nextExpId = Math.max(...db.expenses.map(x => x.expense_id), 1950) + 1;
+      db.expenses.push({
+        expense_id: nextExpId,
+        bh_id: 1101,
+        owner_id: 1001,
+        expense_category: document.getElementById('exp-cat').value,
+        description: document.getElementById('exp-desc').value.trim(),
+        amount: Number(document.getElementById('exp-amt').value),
+        expense_date: document.getElementById('exp-date').value
+      });
+      saveDB();
+      closeModal();
+      renderApp();
+      showToast('Expense logged successfully.');
+    }
+
+    // --- Maintenance & Announcements Handlers ---
+    function completeMaintenance(requestId) {
+      const req = db.maintenance_requests.find(r => r.request_id === Number(requestId));
+      if (!req) return;
+      req.status = 'Completed';
+      req.completion_date = '2026-11-13';
+      saveDB();
+      renderApp();
+      showToast(`Maintenance ticket #${requestId} marked as Completed.`);
+    }
+
+    function updateMaintenanceStatus(requestId, status) {
+      const req = db.maintenance_requests.find(r => r.request_id === Number(requestId));
+      if (!req) return;
+      req.status = status;
+      saveDB();
+      renderApp();
+      showToast(`Ticket #${requestId} updated to ${status}.`);
+    }
+
+    function handlePublishAnnouncement(e) {
+      e.preventDefault();
+      const title = document.getElementById('ann-title').value.trim();
+      const message = document.getElementById('ann-message').value.trim();
+      const nextAnnId = Math.max(...db.announcements.map(a => a.announcement_id), 1600) + 1;
+
+      db.announcements.push({
+        announcement_id: nextAnnId,
+        owner_id: 1001,
+        announcement_title: title,
+        announcement_message: message,
+        date_published: '2026-11-13',
+        recipients: db.tenants.map(t => t.tenant_id)
+      });
+
+      saveDB();
+      renderApp();
+      showToast('Announcement broadcasted to all tenants.');
+    }
+
+    function handleTenantMaintenanceSubmit(e) {
+      e.preventDefault();
+      const tenant = getTenantById(currentUser.tenant_id);
+      const assign = getActiveAssignmentForTenant(tenant.tenant_id);
+      if (!assign) return;
+
+      const nextReqId = Math.max(...db.maintenance_requests.map(r => r.request_id), 1700) + 1;
+      db.maintenance_requests.push({
+        request_id: nextReqId,
+        tenant_id: tenant.tenant_id,
+        room_id: assign.room_id,
+        owner_id: 1001,
+        request_title: document.getElementById('req-title').value.trim(),
+        request_description: document.getElementById('req-desc').value.trim(),
+        request_date: '2026-11-13',
+        status: 'Pending',
+        completion_date: null
+      });
+
+      saveDB();
+      renderApp();
+      showToast('Maintenance request submitted to Owner.');
+    }
+  </script>
+</body>
+</html>
